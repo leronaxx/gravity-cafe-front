@@ -161,6 +161,8 @@ function initMenuPage() {
       cartEmpty.style.display = 'block';
       prepTime.textContent = '0 минут';
       cartTotal.textContent = '0 ₽';
+      // Сообщаем ИИ-ассистенту, что корзина пуста.
+      window.__gravityCart = [];
       return;
     }
 
@@ -199,6 +201,16 @@ function initMenuPage() {
 
     prepTime.textContent = `${state.maxPrep} минут`;
     cartTotal.textContent = `${total} ₽`;
+
+    // Отдаём состав корзины ИИ-ассистенту (см. ai-assistant.js).
+    // Благодаря этому ассистент видит, что уже выбрал гость, и может
+    // советовать с учётом заказа: «к вашему латте подойдёт тирамису».
+    window.__gravityCart = state.cart
+      .map((entry) => {
+        const item = menuItems.find((m) => m.id === entry.id);
+        return item ? { name: item.name, quantity: entry.qty, price: item.price } : null;
+      })
+      .filter(Boolean);
   }
 
   function addToCart(id) {
